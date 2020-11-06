@@ -254,3 +254,8 @@ declare_args() {
   # the native binary size by ~70Kb.
   enable_media_remoting_rpc = enable_media_remoting && !is_android
 }
+
+declare_args() {
+  # Allow the use of libcamera instead of V4l2
+  use_libcamera = false
+}
