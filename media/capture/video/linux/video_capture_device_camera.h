@@ -6,8 +6,8 @@
 #define MEDIA_CAPTURE_VIDEO_LINUX_VIDEO_CAPTURE_DEVICE_CAMERA_H_
 
 #include "base/threading/thread.h"
-#include "media/capture/video/video_capture_device.h"
 #include "media/capture/video/linux/camera_capture_device_impl.h"
+#include "media/capture/video/video_capture_device.h"
 
 using libcamera::CameraManager;
 using libcamera::PixelFormat;
