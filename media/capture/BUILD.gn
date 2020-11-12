@@ -275,6 +275,14 @@ component("capture_lib") {
       "video/linux/video_capture_device_linux.cc",
       "video/linux/video_capture_device_linux.h",
     ]
+    if (use_libcamera) {
+      sources += [
+        "video/linux/camera_capture_device.h",
+        "video/linux/camera_capture_device_impl.cc",
+        "video/linux/camera_capture_device_impl.h",
+      ]
+      configs += [ ":libcamera" ]
+    }
   }
 
   if (is_ash) {
