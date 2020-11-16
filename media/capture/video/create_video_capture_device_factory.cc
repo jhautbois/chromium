@@ -11,7 +11,11 @@
 #include "media/capture/video/file_video_capture_device_factory.h"
 
 #if defined(OS_LINUX) && !defined(OS_CHROMEOS)
+#if defined(USE_LIBCAMERA)
+#include "media/capture/video/linux/video_capture_device_factory_camera.h"
+#else
 #include "media/capture/video/linux/video_capture_device_factory_linux.h"
+#endif
 #elif defined(OS_CHROMEOS)
 #include "media/capture/video/chromeos/camera_app_device_bridge_impl.h"
 #include "media/capture/video/chromeos/public/cros_features.h"
@@ -83,7 +87,12 @@ std::unique_ptr<VideoCaptureDeviceFactory>
 CreatePlatformSpecificVideoCaptureDeviceFactory(
     scoped_refptr<base::SingleThreadTaskRunner> ui_task_runner) {
 #if defined(OS_LINUX) && !defined(OS_CHROMEOS)
+#if defined(USE_LIBCAMERA)
+  return std::make_unique<libcamera::VideoCaptureDeviceFactoryCamera>(
+      ui_task_runner);
+#else
   return std::make_unique<VideoCaptureDeviceFactoryLinux>(ui_task_runner);
+#endif
 #elif defined(OS_CHROMEOS)
   return CreateChromeOSVideoCaptureDeviceFactory(ui_task_runner, {});
 #elif defined(OS_WIN)

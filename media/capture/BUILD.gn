@@ -281,6 +281,8 @@ component("capture_lib") {
         "video/linux/camera_capture_delegate.h",
         "video/linux/video_capture_device_camera.cc",
         "video/linux/video_capture_device_camera.h",
+        "video/linux/video_capture_device_factory_camera.cc",
+        "video/linux/video_capture_device_factory_camera.h",
       ]
       configs += [ ":libcamera" ]
     }
