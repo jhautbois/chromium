@@ -297,7 +297,6 @@ bool CameraCaptureDelegate::StartStream() {
 }
 
 void CameraCaptureDelegate::RequestComplete(Request* request) {
-  DCHECK(camera_task_runner_->BelongsToCurrentThread());
   DCHECK(is_capturing_);
 
   if (request->status() != Request::RequestComplete)
