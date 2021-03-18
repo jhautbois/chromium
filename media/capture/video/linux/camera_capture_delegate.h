@@ -73,7 +73,7 @@ class CAPTURE_EXPORT CameraCaptureDelegate final {
   friend class CameraCaptureDelegateTest;
 
   bool StartStream();
-  void DoCapture();
+  void ProcessRequest(Request *request);
   bool StopStream();
 
   void SetErrorState(VideoCaptureError error,

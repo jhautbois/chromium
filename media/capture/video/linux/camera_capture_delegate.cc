@@ -112,6 +112,11 @@ void CameraCaptureDelegate::AllocateAndStart(
   DCHECK(client);
   client_ = std::move(client);
 
+  if (is_capturing_) {
+    LOG(ERROR) << "Camera is already started !";
+    return;
+  }
+
   int ret = selected_camera_->acquire();
   if (ret != 0) {
     LOG(ERROR) << "Camera can't be acquired: " << ret;
@@ -295,9 +300,10 @@ bool CameraCaptureDelegate::StartStream() {
 
   return true;
 }
-
-void CameraCaptureDelegate::RequestComplete(Request* request) {
-  DCHECK(is_capturing_);
+void CameraCaptureDelegate::ProcessRequest(Request *request) {
+  DCHECK(camera_task_runner_->BelongsToCurrentThread());
+  if (!is_capturing_)
+    return;
 
   if (request->status() != Request::RequestComplete)
     return;
@@ -334,12 +340,23 @@ void CameraCaptureDelegate::RequestComplete(Request* request) {
   selected_camera_->queueRequest(request);
 }
 
+void CameraCaptureDelegate::RequestComplete(Request *request) {
+  if (request->status() == Request::RequestCancelled)
+    return;
+
+  camera_task_runner_->PostTask(
+          FROM_HERE,
+          base::BindOnce(&CameraCaptureDelegate::ProcessRequest,
+          GetWeakPtr(),
+          request));
+}
+
 bool CameraCaptureDelegate::StopStream() {
   DCHECK(camera_task_runner_->BelongsToCurrentThread());
+  is_capturing_ = false;
 
   selected_camera_->stop();
   selected_camera_->release();
-  is_capturing_ = false;
   selected_camera_->requestCompleted.disconnect(
       this, &CameraCaptureDelegate::RequestComplete);
   requests_.clear();
