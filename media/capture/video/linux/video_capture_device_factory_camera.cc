@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 #include "media/capture/video/linux/video_capture_device_factory_camera.h"
-
 using libcamera::ControlList;
 using libcamera::Size;
 using libcamera::StreamRole;
@@ -43,7 +42,6 @@ void VideoCaptureDeviceFactoryCamera::GetDevicesInfo(
   std::vector<std::string> filepaths;
 
   std::string name;
-
   for (const std::shared_ptr<Camera>& cam : cm_->cameras()) {
     Camera* camera = cam.get();
     std::unique_ptr<CameraConfiguration> config;
@@ -69,9 +67,16 @@ void VideoCaptureDeviceFactoryCamera::GetDevicesInfo(
       VideoCaptureFormats* supported_formats =
           &devices_info.back().supported_formats;
 
+      unsigned int index = 0;
       for (const StreamConfiguration& cfg : *config) {
+        LOG(ERROR) << index << ": " << cfg.toString();
+
         const StreamFormats& formats = cfg.formats();
         for (PixelFormat pixelformat : formats.pixelformats()) {
+          LOG(ERROR) << " * Pixelformat: "
+ 				             << pixelformat.toString() << " "
+				             << formats.range(pixelformat).toString();
+
           VideoCaptureFormat supported_format;
           supported_format.pixel_format =
               VideoCaptureDeviceCamera::LibCameraToChromiumPixelFormat(
@@ -81,6 +86,8 @@ void VideoCaptureDeviceFactoryCamera::GetDevicesInfo(
             continue;
 
           for (const Size& size : formats.sizes(pixelformat)) {
+            LOG(ERROR) << "  - " << size.toString();
+
             supported_format.frame_size.SetSize(size.width, size.height);
             supported_format.frame_rate = 0;
             supported_formats->push_back(supported_format);

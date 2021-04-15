@@ -32,11 +32,11 @@ struct {
   PixelFormat libcamera_format;
   VideoPixelFormat pixel_format;
 } constexpr kSupportedFormatsAndPlanarity[] = {
-    {::libcamera::formats::YUV420, PIXEL_FORMAT_I420},
+//    {::libcamera::formats::YUV420, PIXEL_FORMAT_I420},
     {::libcamera::formats::NV12, PIXEL_FORMAT_NV12},
-    {::libcamera::formats::YUYV, PIXEL_FORMAT_YUY2},
-    {::libcamera::formats::BGR888, PIXEL_FORMAT_RGB24},
-    {::libcamera::formats::RGB888, PIXEL_FORMAT_XBGR},
+//    {::libcamera::formats::YUYV, PIXEL_FORMAT_YUY2},
+//    {::libcamera::formats::BGR888, PIXEL_FORMAT_RGB24},
+//    {::libcamera::formats::RGB888, PIXEL_FORMAT_XBGR},
     // MJPEG is usually sitting fairly low since we don't want to have to
     // decode. However, it is needed for large resolutions due to USB bandwidth
     // limitations, so GetListOfUsablePixelFormats() can duplicate it on top,
@@ -112,6 +112,8 @@ void CameraCaptureDelegate::AllocateAndStart(
   DCHECK(client);
   client_ = std::move(client);
 
+  LOG(ERROR) << "Allocate and start for " << width << "x" << height;
+
   if (is_capturing_) {
     LOG(ERROR) << "Camera is already started !";
     return;
@@ -128,7 +130,8 @@ void CameraCaptureDelegate::AllocateAndStart(
   auto best = list_usuable_formats.front();
 
   config_ =
-      selected_camera_->generateConfiguration({StreamRole::VideoRecording});
+      selected_camera_->generateConfiguration({StreamRole::Viewfinder});
+  LOG(ERROR) << "Generated " << config_->size() << " configurations.";
   StreamConfiguration& cfg = config_->at(0);
   cfg.size = {width, height};
   cfg.pixelFormat = best;
@@ -140,14 +143,14 @@ void CameraCaptureDelegate::AllocateAndStart(
       capture_format_.frame_rate = frame_rate;
       capture_format_.pixel_format =
           LibCameraToChromiumPixelFormat(cfg.pixelFormat);
-      LOG(INFO) << "Camera configuration validated: " << cfg.toString();
+      LOG(ERROR) << "Camera configuration validated: " << cfg.toString();
       break;
     case CameraConfiguration::Adjusted:
       capture_format_.frame_size.SetSize(cfg.size.width, cfg.size.height);
       capture_format_.frame_rate = frame_rate;
       capture_format_.pixel_format =
           LibCameraToChromiumPixelFormat(cfg.pixelFormat);
-      LOG(WARNING) << "Camera configuration adjusted: " << cfg.toString();
+      LOG(ERROR) << "Camera configuration adjusted: " << cfg.toString();
       break;
     case CameraConfiguration::Invalid:
       LOG(ERROR) << "Camera configuration invalid: " << cfg.toString();
